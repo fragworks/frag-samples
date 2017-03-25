@@ -1,0 +1,27 @@
+#######
+# NIM #
+#######
+
+# generated
+*.log
+main
+!main/
+nakefile
+nimcache/
+
+##############
+# SUBMODULES #
+##############
+
+vendor
+platforms
+
+###############
+# ENVIRONMENT #
+###############
+
+*.swp
+.DS_store
+.vscode
+*.idea
+*.iml
