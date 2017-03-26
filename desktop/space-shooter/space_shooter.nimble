@@ -6,7 +6,7 @@ description   = "Space shooter demo for FRAG"
 license       = "MIT"
 
 srcDir        = "src"
-bin           = "space_shooter"
+bin           = @["src/space_shooter"]
 
 # Dependencies
 
