@@ -10,6 +10,9 @@ import
   frag/modules/module,
   frag/sound/sound
 
+import
+  ../state
+
 type
   MainMenuScreen* = ref object
     width, height: float
@@ -43,8 +46,14 @@ proc show*(screen: MainMenuScreen, assetManager: AssetManager) =
   backgroundMusic.play()
   screen.visible = true
 
-proc render*(screen: MainMenuScreen, gui: GUI, batch: SpriteBatch, assetManager: AssetManager, backgroundTextureId: Hash, deltaTime: float) =
-  
+proc hide*(screen: MainMenuScreen, assetManager: AssetManager) =
+  screen.visible = false
+  let backgroundMusic = assets.get[Sound](assetManager, screen.backgroundMusicId)
+  backgroundMusic.stop()
+  screen.visible = false
+
+proc render*(screen: MainMenuScreen, gui: GUI, batch: SpriteBatch, assetManager: AssetManager, backgroundTextureId: Hash, deltaTime: float): AppState =
+  result = AppState.MainMenu
   let backgroundTexture = assets.get[Texture](assetManager, backgroundTextureId)
   let logoTexture = assets.get[Texture](assetManager, screen.logoTextureId)
 
@@ -63,9 +72,20 @@ proc render*(screen: MainMenuScreen, gui: GUI, batch: SpriteBatch, assetManager:
   let logoWidth = float logoTexture.data.w
   let logoHeight = float logoTexture.data.h
 
-  batch.draw(logoTexture, (screen.width / 2.0) - (logoWidth / 2), screen.height - (screen.height / 3.0) - (logoHeight / 2), logoWidth, logoHeight)
+  let menuLeft = (screen.width / 2.0) - (logoWidth / 2)
+  let menuTop = screen.height - (screen.height / 3.0) - (logoHeight / 2)
+
+  batch.draw(logoTexture, menuLeft, menuTop, logoWidth, logoHeight)
   batch.`end`()
 
-  if gui.openWindow("", 0, 0, screen.width, screen.height, WINDOW_NO_SCROLLBAR.ord):
-    
+  if gui.openWindow("", menuLeft, menuTop, logoWidth, 300, WINDOW_NO_SCROLLBAR.ord):
+    gui.layoutDynamicRow(30, 1)
+    if gui.buttonLabel("New Game"):
+      hide(screen, assetManager)
+      return AppState.Game
+    gui.layoutDynamicRow(30, 1)
+    discard gui.buttonLabel("Load Game")
+    gui.layoutDynamicRow(30, 1)
+    discard gui.buttonLabel("High Scores")
     gui.closeWindow()
+  

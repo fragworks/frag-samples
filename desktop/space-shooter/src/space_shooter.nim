@@ -9,7 +9,6 @@ import
 
 import
   frag,
-  frag/events/app_event_handler,
   frag/graphics/camera,
   frag/graphics/two_d/spritebatch,
   frag/graphics/two_d/texture,
@@ -20,11 +19,9 @@ import
   frag/modules/gui
 
 import
-  screens/main_menu_screen
-
-type
-  AppState {.pure.} = enum
-    MainMenu, Game
+  screens/main_menu_screen,
+  screens/game_screen,
+  state
 
 type
   App = ref object
@@ -34,7 +31,6 @@ type
     player: Player
     mainMenuScreen: MainMenuScreen
     state: AppState
-    eventHandler: AppEventHandler
 
   Player = ref object
     position: Vec2
@@ -46,7 +42,7 @@ const HALF_WIDTH = WIDTH / 2
 const THIRD_HEIGHT = HEIGHT / 3
 const PLAYER_SPEED = 350.0
 
-proc resize*(e: EventArgs) =
+proc resizeApp*(e: EventArgs) =
   let event = SDLEventMessage(e).event
   let sdlEventData = event.sdlEventData
   
@@ -59,11 +55,10 @@ proc resize*(e: EventArgs) =
   app.guiCamera.ortho(1.0, w, h, true)
   app.gameCamera.ortho(1.0, w, h)
 
-proc initializeApp(app: App, ctx: Frag) =
+proc initApp(app: App, ctx: Frag) =
   logDebug "Initializing app..."
 
-  app.eventHandler = AppEventHandler()
-  app.eventHandler.init(resize)
+  ctx.events.on(SDLEventType.WindowResize, resizeApp)
 
   app.mainMenuScreen = MainMenuScreen()
   app.mainMenuScreen.init(ctx.assets, WIDTH, HEIGHT)
@@ -139,7 +134,7 @@ proc renderApp(app: App, ctx: Frag, deltaTime: float) =
   of AppState.MainMenu:
     if not app.mainMenuScreen.visible:
       app.mainMenuScreen.show(ctx.assets)
-    app.mainMenuScreen.render(ctx.gui, app.batch, ctx.assets, app.assetIds["background.png"], deltaTime)
+    app.state = app.mainMenuScreen.render(ctx.gui, app.batch, ctx.assets, app.assetIds["background.png"], deltaTime)
   of AppState.Game:
     let tex = assets.get[Texture](ctx.assets, app.assetIds["background.png"])
 
@@ -151,7 +146,7 @@ proc renderApp(app: App, ctx: Frag, deltaTime: float) =
   else:
     discard
 
-startFrag[App](Config(
+startFrag(App(), Config(
   rootWindowTitle: "FRAG - Space Shooter",
   rootWindowPosX: window.posUndefined, rootWindowPosY: window.posUndefined,
   rootWindowWidth: WIDTH, rootWindowHeight: HEIGHT,
