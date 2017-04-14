@@ -19,6 +19,9 @@ import
   frag/modules/gui
 
 import
+  constants,
+  player,
+  screens/loading_screen,
   screens/main_menu_screen,
   screens/game_screen,
   state
@@ -29,18 +32,17 @@ type
     gameCamera, guiCamera: Camera
     assetIds: Table[string, Hash]
     player: Player
+    loadingScreen: LoadingScreen
     mainMenuScreen: MainMenuScreen
+    gameScreen: GameScreen
     state: AppState
-
-  Player = ref object
-    position: Vec2
-    texture: Texture
 
 const WIDTH = 960
 const HEIGHT = 540
-const HALF_WIDTH = WIDTH / 2
-const THIRD_HEIGHT = HEIGHT / 3
-const PLAYER_SPEED = 350.0
+
+var displayDataDirty = false
+var displayData: Point
+var lastLaserPos = -1.0
 
 proc resizeApp*(e: EventArgs) =
   let event = SDLEventMessage(e).event
@@ -52,34 +54,46 @@ proc resizeApp*(e: EventArgs) =
   let h = sdlEventData.window.data2.float
 
   app.mainMenuScreen.resize(w, h)
+  app.gameScreen.resize(w, h)
   app.guiCamera.ortho(1.0, w, h, true)
   app.gameCamera.ortho(1.0, w, h)
+
+  displayDataDirty = true
 
 proc initApp(app: App, ctx: Frag) =
   logDebug "Initializing app..."
 
-  ctx.events.on(SDLEventType.WindowResize, resizeApp)
-
-  app.mainMenuScreen = MainMenuScreen()
-  app.mainMenuScreen.init(ctx.assets, WIDTH, HEIGHT)
-
   app.assetIds = initTable[string, Hash]()
 
-  let filename = "background.png"
-  let filename2 = "player.png"
+  # Load loading screen and main menu backgrounds
+  app.assetIds.add(laserImageFilename, ctx.assets.load(laserImageFilename, AssetType.Texture))
+  app.assetIds.add(loadingImageFilename, ctx.assets.load(loadingImageFilename, AssetType.Texture))
+  app.assetIds.add(spaceBackgroundFilename, ctx.assets.load(spaceBackgroundFilename, AssetType.Texture))
+  while not assets.update(ctx.assets):
+    discard
+    
+  let backgroundTexture = assets.get[Texture](ctx.assets, app.assetIds[spaceBackgroundFilename])
 
-  logDebug "Loading assets..."
-  app.assetIds.add(filename, ctx.assets.load(filename, AssetType.Texture))
-  app.assetIds.add(filename2, ctx.assets.load(filename2, AssetType.Texture))
-  logDebug "Assets loaded."
+  app.loadingScreen = LoadingScreen()
 
-  app.player = Player()
-  app.player.texture = assets.get[Texture](ctx.assets, app.assetIds["player.png"])
+  app.mainMenuScreen = MainMenuScreen()
+  app.mainMenuScreen.init(ctx.assets, WIDTH, HEIGHT, backgroundTexture)
 
-  let texHalfW = app.player.texture.data.w / 2
-  let texHalfH = app.player.texture.data.h / 2
+  app.gameScreen = GameScreen()
+  app.gameScreen.init(ctx.assets, WIDTH, HEIGHT, backgroundTexture, app.assetIds[laserImageFilename])
 
-  app.player.position = [float32 HALF_WIDTH - texHalfW, THIRD_HEIGHT - texHalfH]
+  # Set up event handlers
+  ctx.events.on(SDLEventType.WindowResize, resizeApp)
+
+  #let playerTexture = assets.get[Texture](ctx.assets, app.assetIds["player.png"])
+  #let texHalfW = playerTexture.data.w / 2
+  #let texHalfH = playerTexture.data.h / 2
+  #app.player = Player()
+  #app.player.init(
+  #  playerTexture,
+  #  float32 HALF_WIDTH - texHalfW,
+  #  float32 THIRD_HEIGHT - texHalfH
+  #)
 
   app.batch = SpriteBatch(
     blendSrcFunc: BlendFunc.SrcAlpha,
@@ -100,6 +114,8 @@ proc initApp(app: App, ctx: Frag) =
   gui.setTheme(ctx.gui, GUITheme.White)
 
   app.state = AppState.MainMenu
+
+  displayDataDirty = true
 
   logDebug "App initialized."
 
@@ -122,27 +138,51 @@ proc updateApp(app:App, ctx: Frag, deltaTime: float) =
   app.batch.setProjectionMatrix(app.gameCamera.combined)
   gui.setProjectionMatrix(ctx.gui, app.guiCamera.combined)
 
-  if ctx.input.down("w", true): app.player.position[1] += PLAYER_SPEED * deltaTime
-  if ctx.input.down("s", true): app.player.position[1] -= PLAYER_SPEED * deltaTime
-  if ctx.input.down("d", true): app.player.position[0] += PLAYER_SPEED * deltaTime
-  if ctx.input.down("a", true): app.player.position[0] -= PLAYER_SPEED * deltaTime
+  app.gameScreen.update(ctx.assets, ctx.input, deltaTime)
+
+  
 
 proc renderApp(app: App, ctx: Frag, deltaTime: float) =
   ctx.graphics.clearView(0, ClearMode.Color.ord or ClearMode.Depth.ord, 0x303030ff, 1.0, 0)
+
+  if displayDataDirty:
+    displayData = ctx.graphics.getSize()
+    displayDataDirty = false
 
   case app.state
   of AppState.MainMenu:
     if not app.mainMenuScreen.visible:
       app.mainMenuScreen.show(ctx.assets)
-    app.state = app.mainMenuScreen.render(ctx.gui, app.batch, ctx.assets, app.assetIds["background.png"], deltaTime)
+    app.state = app.mainMenuScreen.render(ctx.gui, app.batch, ctx.assets, deltaTime)
   of AppState.Game:
-    let tex = assets.get[Texture](ctx.assets, app.assetIds["background.png"])
+    if not app.gameScreen.visible:
+      if not app.gameScreen.show(ctx.assets):
+        let w = displayData.x.float32
+        let h = displayData.y.float32
+        let backgroundTexture = assets.get[Texture](ctx.assets, app.assetIds[spaceBackgroundFilename])
+        let loadingTexture = assets.get[Texture](ctx.assets, app.assetIds[loadingImageFilename])
+        let laserTexture = assets.get[Texture](ctx.assets, app.assetIds[laserImageFilename])
 
-    app.batch.begin()
-    app.batch.draw(tex, 0, 0, WIDTH, HEIGHT, true)
-    app.batch.draw(app.player.texture, app.player.position[0], app.player.position[1], float app.player.texture.data.w, float app.player.texture.data.h)
-    app.batch.`end`()
+        let loadingImageLeft = (w / 2.0) - 150
+        let loadingImageTop = h - (h / 2.0) - (150 / 2)
+        
+        if lastLaserPos == -1:
+          lastLaserPos = loadingImageLeft + 100
 
+        let laserDest = lastLaserPos + 100 - laserTexture.data.w.float
+        lastLaserPos = flerp(lastLaserPos, laserDest, deltaTime)
+
+        if lastLaserPos >= loadingImageLeft + loadingTexture.data.w.float32:
+          lastLaserPos = loadingImageLeft + 100
+
+        app.batch.begin()
+        app.batch.draw(backgroundTexture, 0, 0, w, h, true)
+        app.batch.draw(loadingTexture, loadingImageLeft, loadingImageTop, loadingTexture.data.w.float, loadingTexture.data.h.float)
+        app.batch.draw(laserTexture, lastLaserPos, loadingImageTop + 75 - (laserTexture.data.h / 2), laserTexture.data.w.float, laserTexture.data.h.float)
+        app.batch.`end`()
+
+    else:
+      app.gameScreen.render(app.batch)
   else:
     discard
 

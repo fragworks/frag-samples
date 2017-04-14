@@ -17,6 +17,7 @@ type
   MainMenuScreen* = ref object
     width, height: float
     visible*: bool
+    backgroundTexture: Texture
     backgroundMusicId: Hash
     logoTextureId: Hash
     backgroundScrollXOffset, backgroundScrollYOffset: float
@@ -28,16 +29,19 @@ proc resize*(screen: MainMenuScreen, width, height: float) =
   screen.width = width
   screen.height = height
 
-proc init*(screen: MainMenuScreen, assets: AssetManager, width, height: float) =
+proc init*(screen: MainMenuScreen, assets: AssetManager, width, height: float, backgroundTexture: Texture) =
   screen.visible = false
   screen.width = width
   screen.height = height
+  screen.backgroundTexture = backgroundTexture
   screen.backgroundScrollXOffset = 0
   screen.backgroundScrollYOffset = 0
 
   logInfo "Loading main menu assets..."
   screen.backgroundMusicId = assets.load(backgroundMusicFilename, AssetType.Sound)
   screen.logoTextureId = assets.load(logoTextureFilename, AssetType.Texture)
+  while not update(assets):
+    discard
   logInfo "Finished main menu assets..."
 
 proc show*(screen: MainMenuScreen, assetManager: AssetManager) =
@@ -52,9 +56,9 @@ proc hide*(screen: MainMenuScreen, assetManager: AssetManager) =
   backgroundMusic.stop()
   screen.visible = false
 
-proc render*(screen: MainMenuScreen, gui: GUI, batch: SpriteBatch, assetManager: AssetManager, backgroundTextureId: Hash, deltaTime: float): AppState =
+proc render*(screen: MainMenuScreen, gui: GUI, batch: SpriteBatch, assetManager: AssetManager, deltaTime: float): AppState =
   result = AppState.MainMenu
-  let backgroundTexture = assets.get[Texture](assetManager, backgroundTextureId)
+  let backgroundTexture = screen.backgroundTexture
   let logoTexture = assets.get[Texture](assetManager, screen.logoTextureId)
 
   screen.backgroundScrollXOffset -= 0.1
@@ -81,6 +85,7 @@ proc render*(screen: MainMenuScreen, gui: GUI, batch: SpriteBatch, assetManager:
   if gui.openWindow("", menuLeft, menuTop, logoWidth, 300, WINDOW_NO_SCROLLBAR.ord):
     gui.layoutDynamicRow(30, 1)
     if gui.buttonLabel("New Game"):
+      gui.closeWindow()
       hide(screen, assetManager)
       return AppState.Game
     gui.layoutDynamicRow(30, 1)

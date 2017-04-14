@@ -1,0 +1,5 @@
+const loadingImageFilename* = "loading.png"
+const laserImageFilename* = "laser_red.png"
+const spaceBackgroundFilename* = "background.png"
+const gameBackgroundMusicFilename* = "game.ogg"
+const playerTextureFilename* = "player.png"
