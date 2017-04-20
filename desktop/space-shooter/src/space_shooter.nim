@@ -155,7 +155,7 @@ proc updateApp(app:App, ctx: Frag, deltaTime: float) =
   app.guiCamera.update()
 
   app.batch.setProjectionMatrix(app.gameCamera.combined)
-  gui.setProjectionMatrix(ctx.gui, app.guiCamera.combined)
+  gui.setProjectionMatrix(ctx.gui, app.guiCamera.combined, 2)
   
   if app.state == AppState.Game and app.gameScreen.visible:
     app.gameScreen.update(ctx.assets, ctx.input, deltaTime)
@@ -213,5 +213,7 @@ startFrag(App(), Config(
   resetFlags: ResetFlag.VSync,
   logFileName: "example-01.log",
   assetRoot: "../assets",
-  debugMode: BGFX_DEBUG_NONE
+  debugMode: BGFX_DEBUG_NONE,
+  imgui: true,
+  imguiViewId: 2
 ))
