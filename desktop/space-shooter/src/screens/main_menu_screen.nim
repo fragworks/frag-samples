@@ -46,6 +46,7 @@ proc init*(screen: MainMenuScreen, assets: AssetManager, width, height: float, b
 
 proc show*(screen: MainMenuScreen, assetManager: AssetManager) =
   let backgroundMusic = assets.get[Sound](assetManager, screen.backgroundMusicId)
+  backgroundMusic.setGain(0.1)
   backgroundMusic.loop(true)
   backgroundMusic.play()
   screen.visible = true
@@ -76,11 +77,11 @@ proc render*(screen: MainMenuScreen, gui: GUI, batch: SpriteBatch, assetManager:
   let logoWidth = float logoTexture.data.w
   let logoHeight = float logoTexture.data.h
 
-  let menuLeft = (screen.width / 2.0) - (logoWidth / 2)
-  let menuTop = screen.height - (screen.height / 3.0) - (logoHeight / 2)
-
-  batch.draw(logoTexture, menuLeft, menuTop, logoWidth, logoHeight)
+  batch.draw(logoTexture, 960 / 2 - (logoWidth / 2), 540 / 2, logoWidth, logoHeight)
   batch.`end`()
+
+  let menuLeft = (960 / 2.0) - (logoWidth / 2)
+  let menuTop = 540 - (540 / 3.0) - (logoHeight / 2)
 
   if gui.openWindow("", menuLeft, menuTop, logoWidth, 300, WINDOW_NO_SCROLLBAR.ord):
     gui.layoutDynamicRow(30, 1)

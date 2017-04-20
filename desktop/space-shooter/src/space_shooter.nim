@@ -16,7 +16,8 @@ import
   frag/math/fpu_math,
   frag/gui/themes/gui_themes,
   frag/modules/assets,
-  frag/modules/gui
+  frag/modules/gui,
+  frag/utils/viewport
 
 import
   constants,
@@ -30,6 +31,7 @@ type
   App = ref object
     batch: SpriteBatch
     gameCamera, guiCamera: Camera
+    gameViewport, guiViewport: Viewport
     assetIds: Table[string, Hash]
     player: Player
     loadingScreen: LoadingScreen
@@ -50,13 +52,19 @@ proc resizeApp*(e: EventArgs) =
   
   let app = cast[App](event.userData)
   
-  let w = sdlEventData.window.data1.float
-  let h = sdlEventData.window.data2.float
+  let w = sdlEventData.window.data1
+  let h = sdlEventData.window.data2
 
-  app.mainMenuScreen.resize(w, h)
-  app.gameScreen.resize(w, h)
-  app.guiCamera.ortho(1.0, w, h, true)
-  app.gameCamera.ortho(1.0, w, h)
+  #app.mainMenuScreen.resize(w, h)
+  #app.gameScreen.resize(w, h)
+  #app.guiCamera.ortho(1.0, w.float, h.float, true)
+  #app.gameCamera.ortho(1.0, w, h)
+  let graphics = event.graphics
+  
+  graphics.setViewRect(0, 0, 0, uint16 sdlEventData.window.data1, uint16 sdlEventData.window.data2)
+
+  app.gameViewport.update(w, h, false)
+  app.guiViewport.update(w, h, false)
 
   displayDataDirty = true
 
@@ -95,25 +103,36 @@ proc initApp(app: App, ctx: Frag) =
   #  float32 THIRD_HEIGHT - texHalfH
   #)
 
+  gui.setWindow(ctx.gui, ctx.graphics.rootWindow)
+
+  app.gameCamera = Camera()
+  app.guiCamera = Camera()
+
+  app.gameCamera.init(1)
+  app.guiCamera.init(2)
+
+  app.gameCamera.ortho(1.0, WIDTH, HEIGHT)
+  app.guiCamera.ortho(1.0, WIDTH, HEIGHT, true)
+
+  app.gameViewport = Viewport(viewportType: ViewportType.Fit)
+  app.gameViewport.init(WIDTH, HEIGHT, app.gameCamera)
+
+  app.guiViewport = Viewport(viewportType: ViewportType.Fit)
+  app.guiViewport.init(WIDTH, HEIGHT, app.guiCamera)
+
+  gui.setTheme(ctx.gui, GUITheme.White)
+  gui.setCamera(ctx.gui, app.guiCamera)
+  gui.setViewport(ctx.gui, app.guiViewport)
+  app.guiViewport.update(WIDTH, HEIGHT, false)
+
+  app.state = AppState.MainMenu
+
   app.batch = SpriteBatch(
     blendSrcFunc: BlendFunc.SrcAlpha,
     blendDstFunc: BlendFunc.InvSrcAlpha,
     blendingEnabled: true
   )
-  app.batch.init(1000, 0)
-
-  app.gameCamera = Camera()
-  app.guiCamera = Camera()
-
-  app.gameCamera.init(0)
-  app.guiCamera.init(1)
-
-  app.gameCamera.ortho(1.0, WIDTH, HEIGHT)
-  app.guiCamera.ortho(1.0, WIDTH, HEIGHT, true)
-
-  gui.setTheme(ctx.gui, GUITheme.White)
-
-  app.state = AppState.MainMenu
+  app.batch.init(1000, app.gameCamera.viewId)
 
   displayDataDirty = true
 
@@ -137,13 +156,16 @@ proc updateApp(app:App, ctx: Frag, deltaTime: float) =
 
   app.batch.setProjectionMatrix(app.gameCamera.combined)
   gui.setProjectionMatrix(ctx.gui, app.guiCamera.combined)
-
-  app.gameScreen.update(ctx.assets, ctx.input, deltaTime)
+  
+  if app.state == AppState.Game and app.gameScreen.visible:
+    app.gameScreen.update(ctx.assets, ctx.input, deltaTime)
 
   
 
 proc renderApp(app: App, ctx: Frag, deltaTime: float) =
-  ctx.graphics.clearView(0, ClearMode.Color.ord or ClearMode.Depth.ord, 0x303030ff, 1.0, 0)
+  ctx.graphics.clearView(0, ClearMode.Color.ord or ClearMode.Depth.ord, 0x00000000, 1.0, 0)
+
+  ctx.graphics.clearView(app.gameCamera.viewId, ClearMode.Color.ord or ClearMode.Depth.ord, 0x303030ff, 1.0, 0)
 
   if displayDataDirty:
     displayData = ctx.graphics.getSize()
@@ -157,14 +179,12 @@ proc renderApp(app: App, ctx: Frag, deltaTime: float) =
   of AppState.Game:
     if not app.gameScreen.visible:
       if not app.gameScreen.show(ctx.assets):
-        let w = displayData.x.float32
-        let h = displayData.y.float32
         let backgroundTexture = assets.get[Texture](ctx.assets, app.assetIds[spaceBackgroundFilename])
         let loadingTexture = assets.get[Texture](ctx.assets, app.assetIds[loadingImageFilename])
         let laserTexture = assets.get[Texture](ctx.assets, app.assetIds[laserImageFilename])
 
-        let loadingImageLeft = (w / 2.0) - 150
-        let loadingImageTop = h - (h / 2.0) - (150 / 2)
+        let loadingImageLeft = (WIDTH / 2.0) - 150
+        let loadingImageTop = HEIGHT - (HEIGHT / 2.0) - (150 / 2)
         
         if lastLaserPos == -1:
           lastLaserPos = loadingImageLeft + 100
@@ -176,13 +196,13 @@ proc renderApp(app: App, ctx: Frag, deltaTime: float) =
           lastLaserPos = loadingImageLeft + 100
 
         app.batch.begin()
-        app.batch.draw(backgroundTexture, 0, 0, w, h, true)
+        app.batch.draw(backgroundTexture, 0, 0, WIDTH, HEIGHT, true)
         app.batch.draw(loadingTexture, loadingImageLeft, loadingImageTop, loadingTexture.data.w.float, loadingTexture.data.h.float)
         app.batch.draw(laserTexture, lastLaserPos, loadingImageTop + 75 - (laserTexture.data.h / 2), laserTexture.data.w.float, laserTexture.data.h.float)
         app.batch.`end`()
 
     else:
-      app.gameScreen.render(app.batch)
+      app.gameScreen.render(app.batch, deltaTime)
   else:
     discard
 
@@ -193,5 +213,5 @@ startFrag(App(), Config(
   resetFlags: ResetFlag.VSync,
   logFileName: "example-01.log",
   assetRoot: "../assets",
-  debugMode: BGFX_DEBUG_TEXT
+  debugMode: BGFX_DEBUG_NONE
 ))
