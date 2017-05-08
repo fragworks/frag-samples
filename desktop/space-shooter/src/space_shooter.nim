@@ -94,8 +94,8 @@ proc initApp(app: App, ctx: Frag) =
   ctx.events.on(SDLEventType.WindowResize, resizeApp)
 
   #let playerTexture = assets.get[Texture](ctx.assets, app.assetIds["player.png"])
-  #let texHalfW = playerTexture.data.w / 2
-  #let texHalfH = playerTexture.data.h / 2
+  #let texHalfW = playerTexture.width / 2
+  #let texHalfH = playerTexture.height / 2
   #app.player = Player()
   #app.player.init(
   #  playerTexture,
@@ -189,16 +189,16 @@ proc renderApp(app: App, ctx: Frag, deltaTime: float) =
         if lastLaserPos == -1:
           lastLaserPos = loadingImageLeft + 100
 
-        let laserDest = lastLaserPos + 100 - laserTexture.data.w.float
+        let laserDest = lastLaserPos + 100 - laserTexture.width.float
         lastLaserPos = flerp(lastLaserPos, laserDest, deltaTime)
 
-        if lastLaserPos >= loadingImageLeft + loadingTexture.data.w.float32:
+        if lastLaserPos >= loadingImageLeft + loadingTexture.width.float32:
           lastLaserPos = loadingImageLeft + 100
 
         app.batch.begin()
         app.batch.draw(backgroundTexture, 0, 0, WIDTH, HEIGHT, true)
-        app.batch.draw(loadingTexture, loadingImageLeft, loadingImageTop, loadingTexture.data.w.float, loadingTexture.data.h.float)
-        app.batch.draw(laserTexture, lastLaserPos, loadingImageTop + 75 - (laserTexture.data.h / 2), laserTexture.data.w.float, laserTexture.data.h.float)
+        app.batch.draw(loadingTexture, loadingImageLeft, loadingImageTop, loadingTexture.width.float, loadingTexture.height.float)
+        app.batch.draw(laserTexture, lastLaserPos, loadingImageTop + 75 - (laserTexture.height / 2), laserTexture.width.float, laserTexture.height.float)
         app.batch.`end`()
 
     else:

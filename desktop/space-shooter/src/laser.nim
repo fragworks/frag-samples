@@ -16,7 +16,7 @@ type
     boundingBox*: Rectangle
 
 proc draw*(laser: Laser, batch: SpriteBatch) =
-  batch.draw(laser.texture, laser.position[0], laser.position[1], laser.texture.data.w.float, laser.texture.data.h.float, false, 0xFFFFFFFFu32, [1.0'f32, 1.0'f32, 1.0'f32], 90)
+  batch.draw(laser.texture, laser.position[0], laser.position[1], laser.texture.width.float, laser.texture.height.float, false, 0xFFFFFFFFu32, [1.0'f32, 1.0'f32, 1.0'f32], 90)
 
 proc update*(laser: Laser, deltaTime: float) =
   let translateY = SPEED * deltaTime

@@ -16,7 +16,7 @@ type
     boundingBox*: Rectangle
 
 proc draw*(bomb: Bomb, batch: SpriteBatch) =
-  batch.draw(bomb.texture, bomb.position[0], bomb.position[1], bomb.texture.data.w.float, bomb.texture.data.h.float, false, 0xFFFFFFFFu32, [0.5'f32, 0.5'f32, 0.5'f32], 180)
+  batch.draw(bomb.texture, bomb.position[0], bomb.position[1], bomb.texture.width.float, bomb.texture.height.float, false, 0xFFFFFFFFu32, [0.5'f32, 0.5'f32, 0.5'f32], 180)
 
 proc update*(bomb: Bomb, deltaTime: float) =
   let translateY = SPEED * deltaTime

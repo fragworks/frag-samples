@@ -51,7 +51,7 @@ proc resize*(screen: GameScreen, width, height: float) =
   screen.width = width
   screen.height = height
   if screen.player.position[0] > screen.width - 18:
-    screen.player.position[0] = float32 screen.width - screen.player.texture.data.w.float32 - 18
+    screen.player.position[0] = float32 screen.width - screen.player.texture.width.float32 - 18
 
 proc show*(screen: GameScreen, am: AssetManager): bool =
   result = true
@@ -64,21 +64,21 @@ proc show*(screen: GameScreen, am: AssetManager): bool =
   backgroundMusic.play()
 
   let playerTexture = get[Texture](am, screen.playerTextureAssetId)
-  screen.player.init(playerTexture, (screen.width / 2) - (playerTexture.data.w.float32 * 0.5 / 2), 18)
+  screen.player.init(playerTexture, (screen.width / 2) - (playerTexture.width.float32 * 0.5 / 2), 18)
 
   let invaderTexture = get[Texture](am, screen.invaderTextureAssetId)
   screen.invaderArmy.init(invaderTexture, screen.height, screen.width)
   
   let shieldTexture = get[Texture](am, screen.shieldTextureAssetId)
-  let shieldArrayWidth = shieldTexture.data.w * 6
+  let shieldArrayWidth = shieldTexture.width * 6
   var shieldArray1 = ShieldArray()
-  shieldArray1.init(shieldTexture, [float32 30, float32 15 + playerTexture.data.h + shieldTexture.data.h])
+  shieldArray1.init(shieldTexture, [float32 30, float32 15 + playerTexture.height + shieldTexture.height])
   var shieldArray2 = ShieldArray()
-  shieldArray2.init(shieldTexture, [float32 6 + (shieldArrayWidth * 2), float32 15 + playerTexture.data.h + shieldTexture.data.h])
+  shieldArray2.init(shieldTexture, [float32 6 + (shieldArrayWidth * 2), float32 15 + playerTexture.height + shieldTexture.height])
   var shieldArray3 = ShieldArray()
-  shieldArray3.init(shieldTexture, [float32 6 + (shieldArrayWidth * 4), float32 15 + playerTexture.data.h + shieldTexture.data.h])
+  shieldArray3.init(shieldTexture, [float32 6 + (shieldArrayWidth * 4), float32 15 + playerTexture.height + shieldTexture.height])
   var shieldArray4 = ShieldArray()
-  shieldArray4.init(shieldTexture, [float32 6 + (shieldArrayWidth * 6), float32 15 + playerTexture.data.h + shieldTexture.data.h])
+  shieldArray4.init(shieldTexture, [float32 6 + (shieldArrayWidth * 6), float32 15 + playerTexture.height + shieldTexture.height])
   screen.shieldArrays = [shieldArray1, shieldArray2, shieldArray3, shieldArray4]
   
   screen.visible = true
@@ -180,16 +180,16 @@ proc update*(screen: GameScreen, assets: AssetManager, input: Input, deltaTime: 
     var laserTexture = get[Texture](assets, screen.laserTextureAssetId)
     var playerTexture = get[Texture](assets, screen.playerTextureAssetId)
     lastShotFired = sdl.getTicks()
-    let x = float32 screen.player.position[0] + playerTexture.data.w / 4 + laserTexture.data.h / 2
-    let y = screen.player.position[1] + screen.player.texture.data.h.float32 / 2
+    let x = float32 screen.player.position[0] + playerTexture.width / 4 + laserTexture.height / 2
+    let y = screen.player.position[1] + screen.player.texture.height.float32 / 2
     screen.lasers.add(Laser(
       position: [x, y],
       texture: laserTexture,
       boundingBox: Rectangle(
-        x: x - laserTexture.data.h / 2,
+        x: x - laserTexture.height / 2,
         y: y,
-        width: laserTexture.data.h.float,
-        height: laserTexture.data.w.float
+        width: laserTexture.height.float,
+        height: laserTexture.width.float
       )
     ))
     let laserSFX = get[Sound](assets, screen.laserSFXAssetId)
@@ -218,8 +218,8 @@ proc update*(screen: GameScreen, assets: AssetManager, input: Input, deltaTime: 
         boundingBox: Rectangle(
           x: bombPos[0],
           y: bombPos[1],
-          width: bombTexture.data.h.float * 0.5,
-          height: bombTexture.data.w.float * 0.5
+          width: bombTexture.height.float * 0.5,
+          height: bombTexture.width.float * 0.5
         )
       ))
 
@@ -239,7 +239,7 @@ proc update*(screen: GameScreen, assets: AssetManager, input: Input, deltaTime: 
 proc render*(screen: GameScreen, batch: SpriteBatch, deltaTime: float) =
   #app.batch.begin()
   #app.batch.draw(tex, 0, 0, WIDTH, HEIGHT, true)
-  #app.batch.draw(app.player.texture, app.player.position[0], app.player.position[1], float app.player.texture.data.w, float app.player.texture.data.h)
+  #app.batch.draw(app.player.texture, app.player.position[0], app.player.position[1], float app.player.texture.width, float app.player.texture.height)
   #app.batch.`end`()
 
   batch.begin()

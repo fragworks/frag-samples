@@ -25,151 +25,151 @@ proc init*(shieldArray: ShieldArray, shieldTexture: Texture, position: Vec2) =
       boundingBox: Rectangle(
         x: shieldArray.position[0],
         y: shieldArray.position[1],
-        width: shieldTexture.data.w.float,
-        height: shieldTexture.data.h.float
+        width: shieldTexture.width.float,
+        height: shieldTexture.height.float
       )
     ),
     Shield(
       health: 100,
-      relativePosition: [float32 shieldTexture.data.w, 0],
+      relativePosition: [float32 shieldTexture.width, 0],
       texture: shieldTexture,
       boundingBox: Rectangle(
-        x: shieldArray.position[0] + shieldTexture.data.w.float,
+        x: shieldArray.position[0] + shieldTexture.width.float,
         y: shieldArray.position[1],
-        width: shieldTexture.data.w.float,
-        height: shieldTexture.data.h.float
+        width: shieldTexture.width.float,
+        height: shieldTexture.height.float
       )
     ),
     Shield(
       health: 100,
-      relativePosition: [float32 shieldTexture.data.w * 4, 0],
+      relativePosition: [float32 shieldTexture.width * 4, 0],
       texture: shieldTexture,
       boundingBox: Rectangle(
-        x: shieldArray.position[0] + shieldTexture.data.w.float * 4,
+        x: shieldArray.position[0] + shieldTexture.width.float * 4,
         y: shieldArray.position[1],
-        width: shieldTexture.data.w.float,
-        height: shieldTexture.data.h.float
+        width: shieldTexture.width.float,
+        height: shieldTexture.height.float
       )
     ),
     Shield(
       health: 100,
-      relativePosition: [float32 shieldTexture.data.w * 5, 0],
+      relativePosition: [float32 shieldTexture.width * 5, 0],
       texture: shieldTexture,
       boundingBox: Rectangle(
-        x: shieldArray.position[0] + shieldTexture.data.w.float * 5,
+        x: shieldArray.position[0] + shieldTexture.width.float * 5,
         y: shieldArray.position[1],
-        width: shieldTexture.data.w.float,
-        height: shieldTexture.data.h.float
+        width: shieldTexture.width.float,
+        height: shieldTexture.height.float
       )
     ),
     Shield(
       health: 100,
-      relativePosition: [0f32, float32 shieldTexture.data.h],
+      relativePosition: [0f32, float32 shieldTexture.height],
       texture: shieldTexture,
       boundingBox: Rectangle(
         x: shieldArray.position[0],
-        y: shieldArray.position[1] + shieldTexture.data.h.float,
-        width: shieldTexture.data.w.float,
-        height: shieldTexture.data.h.float
+        y: shieldArray.position[1] + shieldTexture.height.float,
+        width: shieldTexture.width.float,
+        height: shieldTexture.height.float
       )
     ),
     Shield(
       health: 100,
-      relativePosition: [float32 shieldTexture.data.w, float32 shieldTexture.data.h],
+      relativePosition: [float32 shieldTexture.width, float32 shieldTexture.height],
       texture: shieldTexture,
       boundingBox: Rectangle(
-        x: shieldArray.position[0] + shieldTexture.data.w.float,
-        y: shieldArray.position[1] + shieldTexture.data.h.float,
-        width: shieldTexture.data.w.float,
-        height: shieldTexture.data.h.float
+        x: shieldArray.position[0] + shieldTexture.width.float,
+        y: shieldArray.position[1] + shieldTexture.height.float,
+        width: shieldTexture.width.float,
+        height: shieldTexture.height.float
       )
     ),
     Shield(
       health: 100,
-      relativePosition: [float32 shieldTexture.data.w * 2, float32 shieldTexture.data.h],
+      relativePosition: [float32 shieldTexture.width * 2, float32 shieldTexture.height],
       texture: shieldTexture,
       boundingBox: Rectangle(
-        x: shieldArray.position[0] + shieldTexture.data.w.float * 2,
-        y: shieldArray.position[1] + shieldTexture.data.h.float,
-        width: shieldTexture.data.w.float,
-        height: shieldTexture.data.h.float
+        x: shieldArray.position[0] + shieldTexture.width.float * 2,
+        y: shieldArray.position[1] + shieldTexture.height.float,
+        width: shieldTexture.width.float,
+        height: shieldTexture.height.float
       )
     ),
     Shield(
       health: 100,
-      relativePosition: [float32 shieldTexture.data.w * 3, float32 shieldTexture.data.h],
+      relativePosition: [float32 shieldTexture.width * 3, float32 shieldTexture.height],
       texture: shieldTexture,
       boundingBox: Rectangle(
-        x: shieldArray.position[0] + shieldTexture.data.w.float * 3,
-        y: shieldArray.position[1] + shieldTexture.data.h.float,
-        width: shieldTexture.data.w.float,
-        height: shieldTexture.data.h.float
+        x: shieldArray.position[0] + shieldTexture.width.float * 3,
+        y: shieldArray.position[1] + shieldTexture.height.float,
+        width: shieldTexture.width.float,
+        height: shieldTexture.height.float
       )
     ),
     Shield(
       health: 100,
-      relativePosition: [float32 shieldTexture.data.w * 4, float32 shieldTexture.data.h],
+      relativePosition: [float32 shieldTexture.width * 4, float32 shieldTexture.height],
       texture: shieldTexture,
       boundingBox: Rectangle(
-        x: shieldArray.position[0] + shieldTexture.data.w.float * 4,
-        y: shieldArray.position[1] + shieldTexture.data.h.float,
-        width: shieldTexture.data.w.float,
-        height: shieldTexture.data.h.float
+        x: shieldArray.position[0] + shieldTexture.width.float * 4,
+        y: shieldArray.position[1] + shieldTexture.height.float,
+        width: shieldTexture.width.float,
+        height: shieldTexture.height.float
       )
     ),
     Shield(
       health: 100,
-      relativePosition: [float32 shieldTexture.data.w * 5, float32 shieldTexture.data.h],
+      relativePosition: [float32 shieldTexture.width * 5, float32 shieldTexture.height],
       texture: shieldTexture,
       boundingBox: Rectangle(
-        x: shieldArray.position[0] + shieldTexture.data.w.float * 5,
-        y: shieldArray.position[1] + shieldTexture.data.h.float,
-        width: shieldTexture.data.w.float,
-        height: shieldTexture.data.h.float
+        x: shieldArray.position[0] + shieldTexture.width.float * 5,
+        y: shieldArray.position[1] + shieldTexture.height.float,
+        width: shieldTexture.width.float,
+        height: shieldTexture.height.float
       )
     ),   
     Shield(
       health: 100,
-      relativePosition: [float32 shieldTexture.data.w, float32 shieldTexture.data.h * 2],
+      relativePosition: [float32 shieldTexture.width, float32 shieldTexture.height * 2],
       texture: shieldTexture,
       boundingBox: Rectangle(
-        x: shieldArray.position[0] + shieldTexture.data.w.float,
-        y: shieldArray.position[1] + shieldTexture.data.h.float * 2,
-        width: shieldTexture.data.w.float,
-        height: shieldTexture.data.h.float
+        x: shieldArray.position[0] + shieldTexture.width.float,
+        y: shieldArray.position[1] + shieldTexture.height.float * 2,
+        width: shieldTexture.width.float,
+        height: shieldTexture.height.float
       )
     ),
     Shield(
       health: 100,
-      relativePosition: [float32 shieldTexture.data.w * 2, float32 shieldTexture.data.h * 2],
+      relativePosition: [float32 shieldTexture.width * 2, float32 shieldTexture.height * 2],
       texture: shieldTexture,
       boundingBox: Rectangle(
-        x: shieldArray.position[0] + shieldTexture.data.w.float * 2,
-        y: shieldArray.position[1] + shieldTexture.data.h.float * 2,
-        width: shieldTexture.data.w.float,
-        height: shieldTexture.data.h.float
+        x: shieldArray.position[0] + shieldTexture.width.float * 2,
+        y: shieldArray.position[1] + shieldTexture.height.float * 2,
+        width: shieldTexture.width.float,
+        height: shieldTexture.height.float
       )
     ),
     Shield(
       health: 100,
-      relativePosition: [float32 shieldTexture.data.w * 3, float32 shieldTexture.data.h * 2],
+      relativePosition: [float32 shieldTexture.width * 3, float32 shieldTexture.height * 2],
       texture: shieldTexture,
       boundingBox: Rectangle(
-        x: shieldArray.position[0] + shieldTexture.data.w.float * 3,
-        y: shieldArray.position[1] + shieldTexture.data.h.float * 2,
-        width: shieldTexture.data.w.float,
-        height: shieldTexture.data.h.float
+        x: shieldArray.position[0] + shieldTexture.width.float * 3,
+        y: shieldArray.position[1] + shieldTexture.height.float * 2,
+        width: shieldTexture.width.float,
+        height: shieldTexture.height.float
       )
     ),
     Shield(
       health: 100,
-      relativePosition: [float32 shieldTexture.data.w * 4, float32 shieldTexture.data.h * 2],
+      relativePosition: [float32 shieldTexture.width * 4, float32 shieldTexture.height * 2],
       texture: shieldTexture,
       boundingBox: Rectangle(
-        x: shieldArray.position[0] + shieldTexture.data.w.float * 4,
-        y: shieldArray.position[1] + shieldTexture.data.h.float * 2,
-        width: shieldTexture.data.w.float,
-        height: shieldTexture.data.h.float
+        x: shieldArray.position[0] + shieldTexture.width.float * 4,
+        y: shieldArray.position[1] + shieldTexture.height.float * 2,
+        width: shieldTexture.width.float,
+        height: shieldTexture.height.float
       )
     )
   ]
@@ -177,4 +177,4 @@ proc init*(shieldArray: ShieldArray, shieldTexture: Texture, position: Vec2) =
 proc draw*(shieldArray: ShieldArray, batch: SpriteBatch) =
   for shield in shieldArray.shields:
     if not shield.isNil:
-      batch.draw(shield.texture, shieldArray.position[0] + shield.relativePosition[0], shieldArray.position[1] + shield.relativePosition[1], shield.texture.data.w.float, shield.texture.data.h.float)
+      batch.draw(shield.texture, shieldArray.position[0] + shield.relativePosition[0], shieldArray.position[1] + shield.relativePosition[1], shield.texture.width.float, shield.texture.height.float)

@@ -63,19 +63,19 @@ proc render*(screen: MainMenuScreen, gui: GUI, batch: SpriteBatch, assetManager:
   let logoTexture = assets.get[Texture](assetManager, screen.logoTextureId)
 
   screen.backgroundScrollXOffset -= 0.1
-  if screen.backgroundScrollXOffset < float(-backgroundTexture.data.w):
+  if screen.backgroundScrollXOffset < float(-backgroundTexture.width):
     screen.backgroundScrollXOffset = 0
   
   screen.backgroundScrollYOffset -= 0.1
-  if screen.backgroundScrollYOffset < float(-backgroundTexture.data.h):
+  if screen.backgroundScrollYOffset < float(-backgroundTexture.height):
     screen.backgroundScrollYOffset = 0
 
   batch.begin()
   batch.draw(backgroundTexture, float screen.backgroundScrollXOffset, float screen.backgroundScrollYOffset, screen.width * 2, screen.height * 2, true)
-  batch.draw(backgroundTexture, float screen.backgroundScrollXOffset + float backgroundTexture.data.w, float screen.backgroundScrollYOffset + float backgroundTexture.data.h, screen.width * 2, screen.height * 2, true)
+  batch.draw(backgroundTexture, float screen.backgroundScrollXOffset + float backgroundTexture.width, float screen.backgroundScrollYOffset + float backgroundTexture.height, screen.width * 2, screen.height * 2, true)
   
-  let logoWidth = float logoTexture.data.w
-  let logoHeight = float logoTexture.data.h
+  let logoWidth = float logoTexture.width
+  let logoHeight = float logoTexture.height
 
   batch.draw(logoTexture, 960 / 2 - (logoWidth / 2), 540 / 2, logoWidth, logoHeight)
   batch.`end`()

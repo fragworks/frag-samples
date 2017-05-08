@@ -24,8 +24,8 @@ proc init*(player: Player, texture: Texture, x, y: float32) =
   player.boundingBox = Rectangle(
     x: x,
     y: y,
-    width: player.texture.data.w.float,
-    height: player.texture.data.h.float
+    width: player.texture.width.float,
+    height: player.texture.height.float
   )
   player.lives = 3
 
@@ -40,13 +40,13 @@ proc draw*(player: Player, batch: SpriteBatch, deltaTime: float) =
       player.hurtTimer = 0
       player.hurt = false
 
-  batch.draw(player.texture, player.position[0], player.position[1], player.texture.data.w.float, player.texture.data.h.float, false, 0xffffffff'u32, [0.5f32, 0.5f32, 1.0f32])
+  batch.draw(player.texture, player.position[0], player.position[1], player.texture.width.float, player.texture.height.float, false, 0xffffffff'u32, [0.5f32, 0.5f32, 1.0f32])
 
   batch.draw(player.texture, player.boundingBox.x, player.boundingBox.y, player.boundingBox.width.float, player.boundingBox.height.float, false, 0xffffffff'u32, [0.5f32, 0.5f32, 1.0f32])
 
 proc moveRight*(player:Player, deltaTime: float, rightBound: float) =
   let dX = SPEED * deltaTime
-  if player.position[0] + (player.texture.data.w / 2) + dX <= rightBound:
+  if player.position[0] + (player.texture.width / 2) + dX <= rightBound:
     player.position[0] += dx
     player.boundingBox.x += dx
 

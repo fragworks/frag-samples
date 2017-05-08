@@ -55,28 +55,28 @@ proc init*(invaderArmy: InvaderArmy, invaderTexture: Texture, boundsTop, boundsR
   for x in 0..<11:
     for y in 0..<5:
       if x == 0:
-        let relY = invaderArmy.boundsTop - ((y * 30).float32 + 20f32 + invaderTexture.data.h.float32 * 0.25)
+        let relY = invaderArmy.boundsTop - ((y * 30).float32 + 20f32 + invaderTexture.height.float32 * 0.25)
         invaderArmy.invaders[11 * y + x] = Invader(
           texture: invaderTexture,
           relPos: [20f32, relY],
           boundingBox: Rectangle(
             x: 20,
             y: relY,
-            width: invaderTexture.data.w.float * 0.25,
-            height: invaderTexture.data.h.float * 0.25,
+            width: invaderTexture.width.float * 0.25,
+            height: invaderTexture.height.float * 0.25,
           )
         )
       else:
-        let relX = (x * 30).float32 + invaderTexture.data.w.float32 * 0.25.float32
-        let relY = invaderArmy.boundsTop - ((y * 30).float32 + 20f32 + invaderTexture.data.h.float32 * 0.25)
+        let relX = (x * 30).float32 + invaderTexture.width.float32 * 0.25.float32
+        let relY = invaderArmy.boundsTop - ((y * 30).float32 + 20f32 + invaderTexture.height.float32 * 0.25)
         invaderArmy.invaders[11 * y + x] = Invader(
           texture: invaderTexture,
           relPos: [relX, relY],
           boundingBox: Rectangle(
             x: relX,
             y: relY,
-            width: invaderTexture.data.w.float * 0.25,
-            height: invaderTexture.data.h.float * 0.25,
+            width: invaderTexture.width.float * 0.25,
+            height: invaderTexture.height.float * 0.25,
           )
         )
 
@@ -103,7 +103,7 @@ proc update*(invaderArmy: InvaderArmy) =
       invaderArmy.direction = South
       invaderArmy.nextY = invaderArmy.position[1] - 30
   of West:
-    var invaderArmyBoundsLeft = invaderArmy.position[0] - invaderArmy.invaders[invaderArmy.lastCol * invaderArmy.firstRow + invaderArmy.firstCol].texture.data.w.float * 0.125
+    var invaderArmyBoundsLeft = invaderArmy.position[0] - invaderArmy.invaders[invaderArmy.lastCol * invaderArmy.firstRow + invaderArmy.firstCol].texture.width.float * 0.125
     for x in countDown(invaderArmy.firstCol, 0):
       invaderArmyBoundsLeft += 30f32
 
@@ -131,4 +131,4 @@ proc draw*(invaderArmy: InvaderArmy, batch: SpriteBatch) =
     if invader.dead:
       continue
     if not(invader.relPos == [0f32,0f32]):
-      batch.draw(invader.texture, invaderArmy.position[0] + invader.relPos[0], invaderArmy.position[1] + invader.relPos[1], invader.texture.data.w.float, invader.texture.data.h.float, false, 0xffffffff'u32, [0.25f32, 0.25f32, 1.0f32])
+      batch.draw(invader.texture, invaderArmy.position[0] + invader.relPos[0], invaderArmy.position[1] + invader.relPos[1], invader.texture.width.float, invader.texture.height.float, false, 0xffffffff'u32, [0.25f32, 0.25f32, 1.0f32])
