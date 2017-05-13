@@ -5,7 +5,6 @@ author        = "Zachary Carter"
 description   = "Space shooter demo for FRAG"
 license       = "MIT"
 
-srcDir        = "src"
 bin           = @["src/space_shooter"]
 
 # Dependencies
